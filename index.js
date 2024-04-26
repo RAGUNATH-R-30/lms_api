@@ -4,7 +4,7 @@ const app = require("./app")
 
 console.log("connecting to mongodb...");
 
-
+//mongodb connection
 mongoose
   .connect(config.MONGODB_URI)
   .then(() => {
