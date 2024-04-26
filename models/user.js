@@ -8,6 +8,13 @@ const  userSchema = new mongoose.Schema({
         type:String,
         enum:['user','admin'],
         default:'user',
-    }
-})
+    },
+    mycourses:[]
+
+},
+{
+  
+    timestamps:true
+}
+)
 module.exports = mongoose.model('User',userSchema,'users')
