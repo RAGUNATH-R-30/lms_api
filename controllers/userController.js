@@ -59,15 +59,27 @@ const userController = {
       //     sameSite: 'none',
       //     expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours expiration
       // });
-      
+
       res.cookie("token", token, {
-        // httpOnly: true,
-        // secure: true,
-        // sameSite: "none",
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours expiration
       });
 
       res.status(200).json({ message: "Login Successfully", token });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  me: async (req, res) => {
+    try {
+      const userId = req.userId;
+      const user = await User.findById(userId).select('-passwordHash -__v ');
+      if(!user){
+        return res.status(400).json({ message: 'user not found' });
+      }
+      res.status(200).json({ user });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
