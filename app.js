@@ -1,5 +1,6 @@
 const express = require('express');
 const userRouter = require('./routes/userRoutes')
+const courseRouter = require('./routes/courseRoutes')
 const app = express();
 const morgan = require('morgan')
 const cors = require('cors')
@@ -13,5 +14,6 @@ app.use(cors({
 app.use(cookieParser())
 app.use(morgan('dev'))
 app.use("/api/users",userRouter)
+app.use("/api/users/course",courseRouter)
     
 module.exports = app
