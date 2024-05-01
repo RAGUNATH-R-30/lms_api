@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const Course = require("../models/course");
-const  Video = require("../models/video")
+const Video = require("../models/video");
 const courseController = {
   uploadcourse: async (req, res) => {
     try {
@@ -13,47 +13,85 @@ const courseController = {
         name,
         sections,
       });
-      const createdCourse = await newCourse.save()
-      return res.status(200).json({ message: "Course Created",createdCourse:createdCourse });
+      const createdCourse = await newCourse.save();
+      return res
+        .status(200)
+        .json({ message: "Course Created", createdCourse: createdCourse });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   },
-  uploadvideo:async(req,res)=>{
+  uploadvideo: async (req, res) => {
     try {
-      const {video_id} = req.body;
-      const video_url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+      const { video_id } = req.body;
+      const video_url =
+        "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
       const newVideo = new Video({
         video_id,
-        video_url
-      })
+        video_url,
+      });
       const videoCreated = await newVideo.save();
-      return res.status(200).json({ message: "video Uploaded",videoCreated:videoCreated });
+      return res
+        .status(200)
+        .json({ message: "video Uploaded", videoCreated: videoCreated });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
-
   },
 
-  getMycourses:async(req,res)=>{
+  getMycourses: async (req, res) => {
     try {
-      const {mentor_id} = req.body;
-      console.log(mentor_id)
-      const mentor = await User.findById(mentor_id)
-      if(!mentor){
+      const { mentor_id } = req.body;
+      console.log(mentor_id);
+      const mentor = await User.findById(mentor_id);
+      if (!mentor) {
         return res.status(400).json({ message: "Mentor Not Exist!" });
       }
-      const myCourses = await Course.find({mentor_id:mentor_id})
+      const myCourses = await Course.find({ mentor_id: mentor_id });
 
-      if(!myCourses){
+      if (!myCourses) {
         return res.status(400).json({ message: "No Courses Available" });
       }
-      return res.status(200).json({ message: "Courses Available",myCourses:myCourses });
+      return res
+        .status(200)
+        .json({ message: "Courses Available", myCourses: myCourses });
     } catch (error) {
       return res.status(500).json({ message: error.message });
-      
     }
-  }
+  },
+
+  getCoursebyId: async (req, res) => {
+    try {
+      const { course_id } = req.body;
+      const course = await Course.findById(course_id);
+
+      if (!course) {
+        return res.status(400).json({ message: "No Courses Available" });
+      }
+      return res
+        .status(200)
+        .json({ message: "Course Available", course: course });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+
+  getVideoUrl: async (req,res) => {
+    try {
+      const { video_id } = req.body;
+      const video = await Video.findOne({video_id:video_id})
+      const video_url = video.video_url;
+
+      if (!video_url) {
+        return res.status(400).json({ message: "No Video Available" });
+      }
+      return res
+        .status(200)
+        .json({ message: "Video Available", video_url: video_url });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
 };
 
 module.exports = courseController;
