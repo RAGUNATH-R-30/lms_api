@@ -23,10 +23,11 @@ const courseController = {
   },
   uploadvideo: async (req, res) => {
     try {
-      const { video_id } = req.body;
+      const { video_id ,course_id} = req.body;
       const video_url =
         "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
       const newVideo = new Video({
+        course_id,
         video_id,
         video_url,
       });
@@ -78,6 +79,7 @@ const courseController = {
 
   getVideoUrl: async (req,res) => {
     try {
+
       const { video_id } = req.body;
       const video = await Video.findOne({video_id:video_id})
       const video_url = video.video_url;
@@ -92,6 +94,22 @@ const courseController = {
       return res.status(500).json({ message: error.message });
     }
   },
+
+  getAllvideos:async(req,res)=>{
+    try {
+      const {course_id} = req.body
+   
+      const videos = await Video.find({course_id:course_id})
+   
+      return res
+        .status(200)
+        .json({ message: "Videos Available", videos: videos });
+
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+      
+    }
+  }
 };
 
 module.exports = courseController;
