@@ -49,7 +49,6 @@ const courseController = {
         return res.status(400).json({ message: "Mentor Not Exist!" });
       }
       const myCourses = await Course.find({ mentor_id: mentor_id });
-      console.log(myCourses)
       if (myCourses.length == 0) {
         return res.status(400).json({ message: "No Courses Available" });
       }
