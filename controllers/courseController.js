@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const Course = require("../models/course");
 const Video = require("../models/video");
+const Mentor = require('../models/mentor')
 const courseController = {
   uploadcourse: async (req, res) => {
     try {
@@ -44,7 +45,7 @@ const courseController = {
     try {
       const { mentor_id } = req.body;
       console.log(mentor_id);
-      const mentor = await User.findById(mentor_id);
+      const mentor = await Mentor.findById(mentor_id);
       if (!mentor) {
         return res.status(400).json({ message: "Mentor Not Exist!" });
       }
@@ -104,6 +105,15 @@ const courseController = {
         .status(200)
         .json({ message: "Videos Available", videos: videos });
 
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+      
+    }
+  },
+  getAllcourses:async(req,res)=>{
+    try {
+      const allcourses = await Course.find({})
+      return res.status(200).json({message:"Courses Retrived",allcourses:allcourses})
     } catch (error) {
       return res.status(500).json({ message: error.message });
       

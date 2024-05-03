@@ -7,4 +7,10 @@ userRouter.post("/register",userController.register)
 userRouter.post("/login",userController.login)
 userRouter.get('/me',auth.isAuth,userController.me)
 
+//mentorroutes 
+userRouter.post("/mentorregister",userController.mentorRegister);
+userRouter.post("/mentorlogin",userController.mentorLogin);
+userRouter.get('/mentorme',auth.isMentor,userController.mentorme)
+
+
 module.exports = userRouter
