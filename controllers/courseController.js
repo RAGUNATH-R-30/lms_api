@@ -118,6 +118,39 @@ const courseController = {
       return res.status(500).json({ message: error.message });
       
     }
+  },
+  enrollCourse:async(req,res)=>{
+    try {
+      const {course_id,user_id} =req.body
+      const user_courses = await User.findByIdAndUpdate(user_id,{$push:{mycourses:course_id}})
+
+      return res.status(200).json({message:"Course Enrolled",mycourses:user_courses})
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  getUsercourses:async(req,res)=>{
+    try {
+      const {user_id} = req.body
+      const user = await User.findById(user_id)
+      const user_course_ids = user.mycourses;
+      let userCourses = []
+      // user_course_ids.map(async(item)=>{
+      //   let course = await Course.findById(item)
+      //   userCourses.push(course)
+      // })
+      await Promise.all(user_course_ids.map(async (item) => {
+        let course = await Course.findById(item);
+        userCourses.push(course);
+      }));
+      console.log(userCourses)
+      return res.status(200).json({message:"Retrieved User Courses",usercourses:userCourses})
+
+      // console.log(user)
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+      
+    }
   }
 };
 
