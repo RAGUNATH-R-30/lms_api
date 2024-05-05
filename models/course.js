@@ -6,6 +6,7 @@ const courseSchema = new mongoose.Schema(
     description: String,
     mentor_id: String,
     name: String,
+    price:String, 
     sections: {},
   },
   {

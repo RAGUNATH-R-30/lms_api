@@ -25,13 +25,14 @@ const s3Client = new S3Client({
 const courseController = {
   uploadcourse: async (req, res) => {
     try {
-      const { author_name, description, mentor_id, name, sections } = req.body;
+      const { author_name, description, mentor_id, name, sections,price } = req.body;
       const newCourse = new Course({
         author_name,
         description,
         mentor_id,
         name,
         sections,
+        price
       });
       const createdCourse = await newCourse.save();
       return res
