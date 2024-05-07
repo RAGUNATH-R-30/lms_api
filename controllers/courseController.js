@@ -252,9 +252,12 @@ const courseController = {
   getUserprogress:async(req,res)=>{
     try {
       const{user_id,course_id} = req.body;
+      // console.log(user_id,course_id)
       const userProgress =await UserProgress.findOne({user_id:user_id,course_id:course_id})
+      // console.log(userProgress) 
+      
       if(userProgress){
-        // console.log(userProgress) 
+        console.log(userProgress) 
       return res.status(200).json({message:"Progress Available",userprogress:userProgress})
       }
       else{
