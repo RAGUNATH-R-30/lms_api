@@ -3,6 +3,8 @@ const User = require("../models/user");
 const Course = require("../models/course");
 const Video = require("../models/video");
 const Mentor = require('../models/mentor')
+const Quiz = require('../models/quiz')
+const UserProgress = require('../models/progress')
 const multer = require('multer');
 const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 
@@ -25,14 +27,17 @@ const s3Client = new S3Client({
 const courseController = {
   uploadcourse: async (req, res) => {
     try {
-      const { author_name, description, mentor_id, name, sections,price } = req.body;
+      const { author_name, description, mentor_id, name, sections,price,section1length,section2length,section3length } = req.body;
       const newCourse = new Course({
         author_name,
         description,
         mentor_id,
         name,
         sections,
-        price
+        price,
+        section1length,
+        section2length,
+        section3length
       });
       const createdCourse = await newCourse.save();
       return res
@@ -192,6 +197,15 @@ const courseController = {
       const {course_id,user_id} =req.body
       const user_courses = await User.findByIdAndUpdate(user_id,{$push:{mycourses:course_id}})
 
+      const newProgress = new UserProgress({
+        user_id,
+        course_id,
+        section_1_progress:[],
+        section_2_progress:[],
+        section_3_progress:[],
+      })
+      console.log(course_id,user_id)
+      const user_progress = await newProgress.save();
       return res.status(200).json({message:"Course Enrolled",mycourses:user_courses})
     } catch (error) {
       return res.status(500).json({ message: error.message });
@@ -215,6 +229,37 @@ const courseController = {
       return res.status(200).json({message:"Retrieved User Courses",usercourses:userCourses})
 
       // console.log(user)
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+      
+    }
+  },
+  createQuiz:async(req,res)=>{
+    try {
+        const{content_id,quiz} = req.body
+      console.log(content_id)
+        const newQuiz = new Quiz({
+          id:content_id,
+          quiz
+        });
+        const createdQuiz = await newQuiz.save();
+
+      return res.status(200).json({message:"Quiz Created"})
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  getUserprogress:async(req,res)=>{
+    try {
+      const{user_id,course_id} = req.body;
+      const userProgress =await UserProgress.findOne({user_id:user_id,course_id:course_id})
+      if(userProgress){
+        // console.log(userProgress) 
+      return res.status(200).json({message:"Progress Available",userprogress:userProgress})
+      }
+      else{
+        return res.status(400).json({ message: "No progress Available" });
+      }
     } catch (error) {
       return res.status(500).json({ message: error.message });
       

@@ -27,6 +27,10 @@ courseRouter.post('/getallvideos',auth.isAuth,courseController.getAllvideos)
 courseRouter.get('/getallcourses',auth.isAuth,courseController.getAllcourses)
 courseRouter.post('/enrollcourse',auth.isAuth,courseController.enrollCourse)
 courseRouter.post('/getusercourses',auth.isAuth,courseController.getUsercourses)
+courseRouter.post('/createquiz',auth.isAuth,courseController.createQuiz)
+courseRouter.post('/getuserprogress',auth.isAuth,courseController.getUserprogress)
+
+
 
 module.exports = courseRouter
 
