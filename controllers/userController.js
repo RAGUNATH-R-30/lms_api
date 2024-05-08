@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const User = require("../models/user");
 const Mentor = require("../models/mentor")
+const Admin =require("../models/admin")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
@@ -59,6 +60,32 @@ const userController = {
       return res.status(500).json({ message: error.message });
     }
   },
+  adminRegister:async(req,res)=>{
+    try {
+      const { email, username, password } = req.body;
+
+      const admin = await Admin.findOne({ email });
+
+      if (admin) {
+        return res.status(500).json({ message: "User Already Exist!!" });
+      }
+      const passwordHash = await bcrypt.hash(password, 10);
+
+      const newAdmin = new Admin({
+        email,
+        username,
+        passwordHash: passwordHash,
+      });
+
+      const createdadmin = await newAdmin.save();
+
+      return res
+        .status(200)
+        .json({ message: "User Created", newadmin: createdadmin });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
 
   login: async (req, res) => {
     try {
@@ -112,6 +139,40 @@ const userController = {
         {
           email: mentor.email,
           id: mentor._id,
+        },
+        config.SECRET_KEY
+      );
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours expiration
+      });
+
+      res.status(200).json({ message: "Login Successfully", token });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+
+  adminLogin:async(req,res)=>{
+    try {
+      const { email, password } = req.body;
+      const admin = await Admin.findOne({ email });
+
+      if (!admin) {
+        return res.status(400).json({ message: "User Not Exist!" });
+      }
+      const isPassword = await bcrypt.compare(password, admin.passwordHash);
+
+      if (!isPassword) {
+        return res.status(400).json({ message: "Incorrect password" });
+      }
+
+      const token = jwt.sign(
+        {
+          email: admin.email,
+          id: admin._id,
         },
         config.SECRET_KEY
       );
