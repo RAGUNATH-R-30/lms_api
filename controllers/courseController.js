@@ -2,16 +2,15 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const Course = require("../models/course");
 const Video = require("../models/video");
-const Mentor = require('../models/mentor')
-const Quiz = require('../models/quiz')
-const UserProgress = require('../models/progress')
-const multer = require('multer');
+const Mentor = require("../models/mentor");
+const Quiz = require("../models/quiz");
+const UserProgress = require("../models/progress");
+const multer = require("multer");
 const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 
 const s3Client = new S3Client({
-  region: "ap-southeast-2"
+  region: "ap-southeast-2",
 });
-
 
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {
@@ -27,7 +26,17 @@ const s3Client = new S3Client({
 const courseController = {
   uploadcourse: async (req, res) => {
     try {
-      const { author_name, description, mentor_id, name, sections,price,section1length,section2length,section3length } = req.body;
+      const {
+        author_name,
+        description,
+        mentor_id,
+        name,
+        sections,
+        price,
+        section1length,
+        section2length,
+        section3length,
+      } = req.body;
       const newCourse = new Course({
         author_name,
         description,
@@ -37,7 +46,7 @@ const courseController = {
         price,
         section1length,
         section2length,
-        section3length
+        section3length,
       });
       const createdCourse = await newCourse.save();
       return res
@@ -49,8 +58,8 @@ const courseController = {
   },
   uploadvideo: async (req, res) => {
     try {
-      const { video_id ,course_id} = req.body;
-      const video = req.file
+      const { video_id, course_id } = req.body;
+      const video = req.file;
 
       // console.log(video)
       // const video_url =
@@ -59,13 +68,13 @@ const courseController = {
       const uploadParams = {
         Bucket: "lms-ragunath-coursevideos",
         Key: video.originalname,
-        Body: video.buffer
-    };
+        Body: video.buffer,
+      };
 
-    const data = await s3Client.send(new PutObjectCommand(uploadParams));
+      const data = await s3Client.send(new PutObjectCommand(uploadParams));
 
-    // Construct S3 URL
-    const video_url = `https://${uploadParams.Bucket}.s3.amazonaws.com/${uploadParams.Key}`;
+      // Construct S3 URL
+      const video_url = `https://${uploadParams.Bucket}.s3.amazonaws.com/${uploadParams.Key}`;
 
       const newVideo = new Video({
         course_id,
@@ -75,9 +84,9 @@ const courseController = {
       const videoCreated = await newVideo.save();
       return res
         .status(200)
-        .json({ message: "video Uploaded",url:video_url });
+        .json({ message: "video Uploaded", url: video_url });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.status(500).json({ message: error.message });
     }
   },
@@ -150,11 +159,10 @@ const courseController = {
     }
   },
 
-  getVideoUrl: async (req,res) => {
+  getVideoUrl: async (req, res) => {
     try {
-
       const { video_id } = req.body;
-      const video = await Video.findOne({video_id:video_id})
+      const video = await Video.findOne({ video_id: video_id });
       const video_url = video.video_url;
 
       if (!video_url) {
@@ -168,106 +176,128 @@ const courseController = {
     }
   },
 
-  getAllvideos:async(req,res)=>{
+  getAllvideos: async (req, res) => {
     try {
-      const {course_id} = req.body
-   
-      const videos = await Video.find({course_id:course_id})
-   
+      const { course_id } = req.body;
+
+      const videos = await Video.find({ course_id: course_id });
+
       return res
         .status(200)
         .json({ message: "Videos Available", videos: videos });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  getAllcourses: async (req, res) => {
+    try {
+      const allcourses = await Course.find({});
+      return res
+        .status(200)
+        .json({ message: "Courses Retrived", allcourses: allcourses });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  enrollCourse: async (req, res) => {
+    try {
+      const { course_id, user_id } = req.body;
+      const user_courses = await User.findByIdAndUpdate(user_id, {
+        $push: { mycourses: course_id },
+      });
 
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-      
-    }
-  },
-  getAllcourses:async(req,res)=>{
-    try {
-      const allcourses = await Course.find({})
-      return res.status(200).json({message:"Courses Retrived",allcourses:allcourses})
-    } catch (error) {
-      return res.status(500).json({ message: error.message });
-      
-    }
-  },
-  enrollCourse:async(req,res)=>{
-    try {
-      const {course_id,user_id} =req.body
-      const user_courses = await User.findByIdAndUpdate(user_id,{$push:{mycourses:course_id}})
+      const course_sections = await Course.findById(course_id);
+      let sectionContentIds = {};
+
+      course_sections.sections.forEach((section) => {
+        section.sectionContent.forEach((content) => {
+          sectionContentIds[content.id] = true;
+        });
+      });
+
+      console.log(sectionContentIds);
+      console.log(course_sections);
 
       const newProgress = new UserProgress({
         user_id,
         course_id,
-        section_1_progress:[],
-        section_2_progress:[],
-        section_3_progress:[],
-      })
-      console.log(course_id,user_id)
+        section_1_progress: [],
+        section_2_progress: [],
+        section_3_progress: [],
+        quiz_progress:sectionContentIds
+      });
+      console.log(course_id, user_id);
       const user_progress = await newProgress.save();
-      return res.status(200).json({message:"Course Enrolled",mycourses:user_courses})
+      return res
+        .status(200)
+        .json({ message: "Course Enrolled", mycourses: user_courses });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   },
-  getUsercourses:async(req,res)=>{
+  getUsercourses: async (req, res) => {
     try {
-      const {user_id} = req.body
-      const user = await User.findById(user_id)
+      const { user_id } = req.body;
+      const user = await User.findById(user_id);
       const user_course_ids = user.mycourses;
-      let userCourses = []
+      let userCourses = [];
       // user_course_ids.map(async(item)=>{
       //   let course = await Course.findById(item)
       //   userCourses.push(course)
       // })
-      await Promise.all(user_course_ids.map(async (item) => {
-        let course = await Course.findById(item);
-        userCourses.push(course);
-      }));
+      await Promise.all(
+        user_course_ids.map(async (item) => {
+          let course = await Course.findById(item);
+          userCourses.push(course);
+        })
+      );
       // console.log(userCourses)
-      return res.status(200).json({message:"Retrieved User Courses",usercourses:userCourses})
+      return res
+        .status(200)
+        .json({ message: "Retrieved User Courses", usercourses: userCourses });
 
       // console.log(user)
     } catch (error) {
       return res.status(500).json({ message: error.message });
-      
     }
   },
-  createQuiz:async(req,res)=>{
+  createQuiz: async (req, res) => {
     try {
-        const{content_id,quiz} = req.body
-      console.log(content_id)
-        const newQuiz = new Quiz({
-          id:content_id,
-          quiz
-        });
-        const createdQuiz = await newQuiz.save();
+      const { content_id, quiz } = req.body;
+      console.log(content_id);
+      const newQuiz = new Quiz({
+        id: content_id,
+        quiz,
+      });
+      const createdQuiz = await newQuiz.save();
 
-      return res.status(200).json({message:"Quiz Created"})
+      return res.status(200).json({ message: "Quiz Created" });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
   },
-  getUserprogress:async(req,res)=>{
+  getUserprogress: async (req, res) => {
     try {
-      const{user_id,course_id} = req.body;
+      const { user_id, course_id } = req.body;
       // console.log(user_id,course_id)
-      const userProgress =await UserProgress.findOne({user_id:user_id,course_id:course_id})
-      // console.log(userProgress) 
-      
-      if(userProgress){
-        console.log(userProgress) 
-      return res.status(200).json({message:"Progress Available",userprogress:userProgress})
-      }
-      else{
+      const userProgress = await UserProgress.findOne({
+        user_id: user_id,
+        course_id: course_id,
+      });
+      // console.log(userProgress)
+
+      if (userProgress) {
+        console.log(userProgress);
+        return res
+          .status(200)
+          .json({ message: "Progress Available", userprogress: userProgress });
+      } else {
         return res.status(400).json({ message: "No progress Available" });
       }
     } catch (error) {
       return res.status(500).json({ message: error.message });
-      
     }
-  }
+  },
 };
 
 module.exports = courseController;
