@@ -8,9 +8,9 @@ const courseSchema = new mongoose.Schema(
     name: String,
     price:String, 
     sections: {},
-    section1length:Number,
-    section2length:Number,
-    section3length:Number,
+    section1avgscore:Number,
+    section2avgscore:Number,
+    section3avgscore:Number,
   },
   {
     timestamps: true,

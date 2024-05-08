@@ -37,6 +37,9 @@ const courseController = {
         section2length,
         section3length,
       } = req.body;
+      const section1avgscore = 100 / section1length
+      const section2avgscore = 100 / section2length
+      const section3avgscore = 100 / section3length
       const newCourse = new Course({
         author_name,
         description,
@@ -44,9 +47,9 @@ const courseController = {
         name,
         sections,
         price,
-        section1length,
-        section2length,
-        section3length,
+        section1avgscore,
+        section2avgscore,
+        section3avgscore,
       });
       const createdCourse = await newCourse.save();
       return res
@@ -215,8 +218,8 @@ const courseController = {
         });
       });
 
-      console.log(sectionContentIds);
-      console.log(course_sections);
+      // console.log(sectionContentIds);
+      // console.log(course_sections);
 
       const newProgress = new UserProgress({
         user_id,
@@ -279,7 +282,7 @@ const courseController = {
   getUserprogress: async (req, res) => {
     try {
       const { user_id, course_id } = req.body;
-      // console.log(user_id,course_id)
+      console.log(user_id,course_id)
       const userProgress = await UserProgress.findOne({
         user_id: user_id,
         course_id: course_id,
@@ -287,7 +290,7 @@ const courseController = {
       // console.log(userProgress)
 
       if (userProgress) {
-        console.log(userProgress);
+        // console.log(userProgress);
         return res
           .status(200)
           .json({ message: "Progress Available", userprogress: userProgress });
@@ -298,6 +301,61 @@ const courseController = {
       return res.status(500).json({ message: error.message });
     }
   },
+  getQuiz:async(req,res)=>{
+    try {
+      const {id} = req.body;
+      const quiz = await Quiz.findOne({id:id})
+      if(!quiz){
+        return res
+          .status(400)
+          .json({ message: " No quiz Available" });
+      }
+      return res
+      .status(200)
+      .json({ message: "Quiz Available", quiz: quiz });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
+  updateQuizanswer:async(req,res)=>{
+    try {
+      const{user_id,course_id,quiz_id,section} = req.body
+    const course = await Course.findById(course_id)
+    if(section == "Section 1"){
+      const section1average = course.section1avgscore
+      const quizAnswerupdate1 = await UserProgress.findOneAndUpdate({user_id:user_id,course_id:course_id},{$push: { section_1_progress: section1average },$set:{[`quiz_progress.${quiz_id}`]:false}},{new:true})  
+      return res
+      .status(200)
+      .json({ message: "Answer updated" });
+    }
+
+    if(section == "Section 2"){
+      const section2average = course.section2avgscore
+      const quizAnswerupdate2 = await UserProgress.findOneAndUpdate({user_id:user_id,course_id:course_id},{$push: { section_2_progress: section2average },$set:{[`quiz_progress.${quiz_id}`]:false}},{new:true})  
+      return res
+      .status(200)
+      .json({ message: "Answer updated" });
+    }
+    
+    if(section == "Section 3"){
+      const section3average = course.section3avgscore
+      const quizAnswerupdate3 = await UserProgress.findOneAndUpdate({user_id:user_id,course_id:course_id},{$push: { section_3_progress: section3average },$set:{[`quiz_progress.${quiz_id}`]:false}},{new:true})  
+      return res
+      .status(200)
+      .json({ message: "Answer updated" });
+    }
+    
+      return res
+      .status(400)
+      .json({ message: " No quiz Available" });
+    
+
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+    
+
+  }
 };
 
 module.exports = courseController;

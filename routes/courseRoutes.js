@@ -29,6 +29,10 @@ courseRouter.post('/enrollcourse',auth.isAuth,courseController.enrollCourse)
 courseRouter.post('/getusercourses',auth.isAuth,courseController.getUsercourses)
 courseRouter.post('/createquiz',auth.isAuth,courseController.createQuiz)
 courseRouter.post('/getuserprogress',auth.isAuth,courseController.getUserprogress)
+courseRouter.post('/getquiz',auth.isAuth,courseController.getQuiz)
+courseRouter.post('/updatequizanswer',auth.isAuth,courseController.updateQuizanswer)
+
+
 
 
 
