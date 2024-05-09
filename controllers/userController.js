@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const Mentor = require("../models/mentor")
 const Admin =require("../models/admin")
+const Requestmentor = require("../models/requestMentor")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../utils/config");
@@ -214,6 +215,29 @@ const userController = {
       return res.status(500).json({ message: error.message });
     }
   },
+  requestMentor:async(req,res)=>{
+    try {
+      const {id,username,email} = req.body
+      const newmentorRequest = new Requestmentor({
+        id,
+        username,
+        email
+      })
+      const newrequest =  await newmentorRequest.save()
+      return res.status(200).json({ message: 'request Created' });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
 
+  getMentorrequests:async(req,res)=>{
+    try {
+      const allmentorRequests = await Requestmentor.find();
+      // console.log(allmentorRequests)
+      return res.status(200).json({ message: 'request sent' ,allrequests:allmentorRequests});
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  }
 };
 module.exports = userController;

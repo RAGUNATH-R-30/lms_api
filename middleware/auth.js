@@ -46,7 +46,7 @@ const auth = {
     try {
         // console.log(req)
      const token = req.cookies.token;
-    //   console.log("tokene",token)
+      // console.log("tokene",token)
       if (!token) {
         return res.status(401).json({ message: "Unauthorized" });
       }

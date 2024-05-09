@@ -15,6 +15,10 @@ userRouter.get('/mentorme',auth.isMentor,userController.mentorme)
 //adminroutes
 userRouter.post("/adminregister",userController.adminRegister);
 userRouter.post("/adminlogin",userController.adminLogin);
+userRouter.get("/getmentorrequests",auth.isAdmin,userController.getMentorrequests)
+
+//requestmentor
+userRouter.post("/requestmentor",auth.isAuth,userController.requestMentor)
 
 
 
