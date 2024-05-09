@@ -334,7 +334,7 @@ const courseController = {
       const quizAnswerupdate2 = await UserProgress.findOneAndUpdate({user_id:user_id,course_id:course_id},{$push: { section_2_progress: section2average },$set:{[`quiz_progress.${quiz_id}`]:false}},{new:true})  
       return res
       .status(200)
-      .json({ message: "Answer updated" });
+      .json({ message: "Answer updated" }); 
     }
     
     if(section == "Section 3"){
