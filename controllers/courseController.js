@@ -273,13 +273,28 @@ const courseController = {
   },
   createQuiz: async (req, res) => {
     try {
-      const { content_id, quiz } = req.body;
+      const { content_id, quiz,section } = req.body;
       console.log(content_id);
+
       const newQuiz = new Quiz({
         id: content_id,
         quiz,
+        isCreated:false
       });
       const createdQuiz = await newQuiz.save();
+
+      const quizcreatedUpdate = await Course.updateOne(
+        { 
+          "sections.sectionContent.id": content_id
+        },
+        { 
+          $set: { "sections.$[section].sectionContent.$[content].isQuizcreated": true }
+        },
+        {
+          arrayFilters: [ { "section.sectionContent.id": content_id }, { "content.id": content_id } ]
+        }
+      )
+      console.log(quizcreatedUpdate)
 
       return res.status(200).json({ message: "Quiz Created" });
     } catch (error) {
