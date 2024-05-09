@@ -238,6 +238,15 @@ const userController = {
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
+  },
+  mentorRegisterUpdate:async(req,res)=>{
+    try {
+      const {user_id} = req.body
+      const mentorUpdate = await Requestmentor.findOneAndUpdate({id:user_id},{$set:{status:"approved"}})
+      return res.status(200).json({ message: 'request updated'});
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
   }
 };
 module.exports = userController;
