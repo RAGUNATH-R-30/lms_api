@@ -7,9 +7,16 @@ const Quiz = require("../models/quiz");
 const UserProgress = require("../models/progress");
 const multer = require("multer");
 const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
+const config = require("../utils/config")
+
+const credentials = {
+  accessKeyId: config.ACCESSKEYID,
+  secretAccessKey:config.SECRETACCESSKEY
+};
 
 const s3Client = new S3Client({
   region: "ap-southeast-2",
+  credentials
 });
 
 // const storage = multer.diskStorage({
