@@ -10,7 +10,7 @@ const cookieParser = require('cookie-parser');
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({
-    origin:'https://ragunath-lms.netlify.app/',
+    origin:'https://ragunath-lms.netlify.app',
     credentials:true
 }))
 app.use(cookieParser())
