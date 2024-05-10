@@ -1,4 +1,4 @@
-# Course Management System API
+# Learning Management System API
 
 Welcome to the Learning Management System API documentation. This API provides endpoints for managing courses, users, mentors, admins, and payments.
 
