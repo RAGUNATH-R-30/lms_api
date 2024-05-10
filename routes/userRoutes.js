@@ -20,6 +20,7 @@ userRouter.get("/getmentorrequests",auth.isAdmin,userController.getMentorrequest
 //requestmentor
 userRouter.post("/requestmentor",auth.isAuth,userController.requestMentor)
 userRouter.post("/mentorregisterupdate",auth.isAuth,userController.mentorRegisterUpdate)
+userRouter.post('/getuserrequest',auth.isAuth,userController.getUserrequest)
 
 
 

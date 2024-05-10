@@ -5,6 +5,8 @@ const Video = require("../models/video");
 const Mentor = require("../models/mentor");
 const Quiz = require("../models/quiz");
 const UserProgress = require("../models/progress");
+const Requestmentor = require("../models/requestMentor")
+
 const multer = require("multer");
 const { PutObjectCommand, S3Client } = require("@aws-sdk/client-s3");
 const config = require("../utils/config")
@@ -375,9 +377,8 @@ const courseController = {
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
-    
-
-  }
+  },
+ 
 };
 
 module.exports = courseController;

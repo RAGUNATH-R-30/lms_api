@@ -247,6 +247,24 @@ const userController = {
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
+  },
+  getUserrequest:async(req,res)=>{
+    try {
+      const{user_id} = req.body;
+      const user_request = await Requestmentor.findOne({id:user_id})
+      if(!user_request){
+        return res
+          .status(400)
+          .json({ message: " No request Available" });
+      }
+      return res
+      .status(200)
+      .json({ message: "Request Available" , user_request:user_request });
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+      
+    }
+
   }
 };
 module.exports = userController;
